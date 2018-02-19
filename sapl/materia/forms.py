@@ -1113,9 +1113,14 @@ class ProposicaoForm(forms.ModelForm):
         widget=widgets.HiddenInput(),
         required=False)
 
+    receber_recibo = forms.TypedChoiceField(
+        choices=(('True', 'Sim'), ('False', 'Não')),
+        coerce=bool,
+        label='Deseja receber recibo?')
+
     class Meta:
-        model = Proposicao
         fields = ['tipo',
+                  'receber_recibo',
                   'descricao',
                   'texto_original',
                   'materia_de_vinculo',
@@ -1124,6 +1129,7 @@ class ProposicaoForm(forms.ModelForm):
                   'numero_materia',
                   'ano_materia',
                   'tipo_texto']
+        model = Proposicao
 
         widgets = {
             'descricao': widgets.Textarea(attrs={'rows': 4}),
@@ -1149,11 +1155,13 @@ class ProposicaoForm(forms.ModelForm):
                      to_column(('ano_materia', 4))
                      ),
 
+            to_column(('receber_recibo', 3)),
             to_column(
                 (Alert('teste',
                        css_class="ementa_materia hidden alert-info",
                        dismiss=False), 12)),
             to_column(('descricao', 12)),
+
         ]
 
         if self.texto_articulado_proposicao:
