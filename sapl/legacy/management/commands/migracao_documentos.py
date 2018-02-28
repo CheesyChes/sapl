@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from sapl.legacy.migracao_documentos import migrar_documentos
+from sapl.legacy.migracao_dados_documentos import migrar_documentos
 
 
 class Command(BaseCommand):
