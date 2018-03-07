@@ -595,34 +595,6 @@ def fill_dados_basicos():
     appconf.save()
 
 
-# Uma anomalia no sapl 2.5 causa a duplicação de registros de votação.
-# Essa duplicação deve ser eliminada para que não haja erro no sapl 3.1
-def excluir_registrovotacao_duplicados():
-    duplicatas_ids = RegistroVotacao.objects.values(
-        'materia', 'ordem', 'expediente').annotate(
-            Count('id')).order_by().filter(id__count__gt=1)
-    duplicatas_queryset = RegistroVotacao.objects.filter(
-        materia__in=[item['materia'] for item in duplicatas_ids])
-
-    for dup in duplicatas_queryset:
-        lista_dups = duplicatas_queryset.filter(
-            materia=dup.materia, expediente=dup.expediente, ordem=dup.ordem)
-        primeiro_registro = lista_dups[0]
-        lista_dups = lista_dups.exclude(pk=primeiro_registro.pk)
-        for objeto in lista_dups:
-            if (objeto.pk > primeiro_registro.pk):
-                try:
-                    objeto.delete()
-                except:
-                    assert 0
-            else:
-                try:
-                    primeiro_registro.delete()
-                    primeiro_registro = objeto
-                except:
-                    assert 0
-
-
 def get_last_pk(model):
     last_value = model.objects.all().aggregate(Max('pk'))
     return last_value['pk__max'] or 0
@@ -728,9 +700,6 @@ class DataMigrator:
         fill_dados_basicos()
         info('Começando migração: %s...' % obj)
         self._do_migrate(obj)
-
-        # info('Excluindo possíveis duplicações em RegistroVotacao...')
-        # excluir_registrovotacao_duplicados()
 
         # recria tipos de autor padrão que não foram criados pela migração
         cria_models_tipo_autor()
