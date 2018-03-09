@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from image_cropping.fields import ImageCropField, ImageRatioField
 from model_utils import Choices
+
 from sapl.base.models import Autor
 from sapl.decorators import vigencia_atual
 from sapl.utils import (INDICADOR_AFASTAMENTO, LISTA_DE_UFS, YES_NO_CHOICES,
@@ -260,12 +261,9 @@ class Parlamentar(models.Model):
         verbose_name=_('Ativo na Casa?'))
     biografia = models.TextField(
         blank=True, verbose_name=_('Biografia'))
-    # XXX Esse atribuito foi colocado aqui para não atrapalhar a migração
-
     fotografia = ImageCropField(
         verbose_name=_('Fotografia'), upload_to=foto_upload_path,
         validators=[restringe_tipos_de_arquivo_img], null=True, blank=True)
-
     cropping = ImageRatioField(
         'fotografia', '128x128', verbose_name=_('Avatar'), size_warning=True,
         help_text=_('A configuração do Avatar '
